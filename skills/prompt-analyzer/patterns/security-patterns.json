@@ -1,0 +1,106 @@
+{
+  "version": "1.0.0",
+  "description": "正则模式库，用于扫描提示词中的敏感信息泄露",
+  "patterns": [
+    {
+      "id": "openai-api-key",
+      "name": "OpenAI API Key",
+      "pattern": "sk-[A-Za-z0-9-_]{20,80}",
+      "severity": "high",
+      "suggestion": "使用环境变量 OPENAI_API_KEY 替代硬编码"
+    },
+    {
+      "id": "anthropic-api-key",
+      "name": "Anthropic API Key",
+      "pattern": "sk-ant-[A-Za-z0-9-_]{20,80}",
+      "severity": "high",
+      "suggestion": "使用环境变量 ANTHROPIC_API_KEY 替代硬编码"
+    },
+    {
+      "id": "github-token",
+      "name": "GitHub Personal Access Token",
+      "pattern": "ghp_[A-Za-z0-9]{36}",
+      "severity": "high",
+      "suggestion": "使用 GitHub CLI (gh auth) 或环境变量替代"
+    },
+    {
+      "id": "github-token-classic",
+      "name": "GitHub Classic Token",
+      "pattern": "gho_[A-Za-z0-9]{36}",
+      "severity": "high",
+      "suggestion": "使用 GitHub CLI (gh auth) 或环境变量替代"
+    },
+    {
+      "id": "aws-access-key",
+      "name": "AWS Access Key ID",
+      "pattern": "AKIA[0-9A-Z]{16}",
+      "severity": "high",
+      "suggestion": "使用 AWS CLI credentials 文件或 IAM Role"
+    },
+    {
+      "id": "aws-secret-key",
+      "name": "AWS Secret Access Key",
+      "pattern": "aws.{0,5}secret.{0,10}[A-Za-z0-9/+]{40}",
+      "flags": "i",
+      "severity": "high",
+      "suggestion": "使用 AWS CLI credentials 文件或 IAM Role"
+    },
+    {
+      "id": "jwt-token",
+      "name": "JWT Token",
+      "pattern": "eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}",
+      "severity": "medium",
+      "suggestion": "不要在提示词中粘贴 JWT token，使用占位符替代"
+    },
+    {
+      "id": "private-key-header",
+      "name": "SSH/RSA 私钥头",
+      "pattern": "-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----",
+      "severity": "critical",
+      "suggestion": "严禁在提示词中粘贴私钥，使用 ssh-agent 或文件引用"
+    },
+    {
+      "id": "basic-auth-url",
+      "name": "URL 中包含用户名密码",
+      "pattern": "https?://[^:]+:[^@]+@[^\\s]+",
+      "severity": "high",
+      "suggestion": "使用环境变量或配置文件存储认证信息"
+    },
+    {
+      "id": "connection-string",
+      "name": "数据库连接字符串",
+      "pattern": "(mongodb|mysql|postgresql|postgres|sqlserver|redis)://[^:]+:[^@]+@[^\\s]+",
+      "severity": "high",
+      "suggestion": "使用环境变量 DATABASE_URL 替代硬编码"
+    },
+    {
+      "id": "internal-ip",
+      "name": "内网 IP 地址",
+      "pattern": "\\b(10\\.\\d{1,3}|172\\.(1[6-9]|2\\d|3[01])|192\\.168)\\.\\d{1,3}\\.\\d{1,3}\\b",
+      "severity": "low",
+      "suggestion": "考虑用占位符替换内网 IP，如 <INTERNAL_IP>"
+    },
+    {
+      "id": "password-assignment",
+      "name": "密码赋值语句",
+      "pattern": "(password|passwd|pwd|secret)\\s*[:=]\\s*[\"'][^\"']{4,}[\"']",
+      "flags": "i",
+      "severity": "medium",
+      "suggestion": "不要在提示词中写入明文密码，使用占位符"
+    },
+    {
+      "id": "deepseek-api-key",
+      "name": "DeepSeek API Key",
+      "pattern": "sk-[A-Za-z0-9-_]{20,80}",
+      "severity": "high",
+      "suggestion": "使用环境变量 DEEPSEEK_API_KEY 替代硬编码"
+    }
+  ],
+  "exclude_patterns": [
+    {
+      "id": "placeholder-skip",
+      "pattern": "(your-api-key|your_token|xxx|placeholder|<[A-Z_]+>)",
+      "description": "明显是占位符的数据，排除误报"
+    }
+  ]
+}

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 协作画像分析报告</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --border: #334155;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.25rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+  .card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .score-ring {
+    width: 120px; height: 120px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700; margin: 0 auto 1rem;
+  }
+  .level-tag {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.85rem; font-weight: 600;
+  }
+  .bar-wrap { margin-bottom: 12px; }
+  .bar-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9rem; }
+  .bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .suggestion-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; margin-bottom: 12px;
+    border-left: 4px solid var(--accent);
+  }
+  .suggestion-card h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .security-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .severity-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+  .severity-critical { background: #7f1d1d; color: #fca5a5; }
+  .severity-high { background: #78350f; color: #fcd34d; }
+  .severity-medium { background: #1e3a5f; color: #93c5fd; }
+  .severity-low { background: #1e293b; color: #94a3b8; }
+  .chart-wrap { position: relative; height: 300px; margin: 1rem 0; }
+  .stat-num { font-size: 2rem; font-weight: 700; }
+  .stat-label { color: var(--text-secondary); font-size: 0.85rem; }
+  @media (max-width: 640px) {
+    .grid, .grid-3 { grid-template-columns: 1fr; }
+  }
+  #report-data { display: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>AI 协作画像分析报告</h1>
+  <p class="subtitle" id="report-meta">基于过去 3 个月 · -- 条提示词</p>
+
+  <h2>AI 技能水平</h2>
+  <div class="grid">
+    <div class="card" style="text-align:center;">
+      <div class="score-ring" id="skill-ring" style="background: conic-gradient(var(--accent) calc(var(--score) * 1%), #1e293b 0);"></div>
+      <div class="level-tag" id="skill-level" style="background: var(--accent); color: #0f172a;">--</div>
+    </div>
+    <div class="card">
+      <div class="chart-wrap"><canvas id="radar-chart"></canvas></div>
+    </div>
+  </div>
+
+  <h2>工作偏向</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="chart-wrap"><canvas id="lang-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="chart-wrap"><canvas id="task-chart"></canvas></div>
+    </div>
+  </div>
+
+  <h2>沟通风格 & 协作模式</h2>
+  <div class="grid">
+    <div class="card">
+      <h3 style="margin-bottom:1rem;">沟通特征</h3>
+      <div id="comm-traits"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:1rem;">协作特征</h3>
+      <div id="collab-traits"></div>
+    </div>
+  </div>
+
+  <h2>使用习惯</h2>
+  <div class="grid-3">
+    <div class="card" style="text-align:center;">
+      <div class="stat-num" id="stat-total">--</div>
+      <div class="stat-label">总提示词数</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat-num" id="stat-avg-len">--</div>
+      <div class="stat-label">平均提示词长度</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat-num" id="stat-active">--</div>
+      <div class="stat-label">活跃时段</div>
+    </div>
+  </div>
+
+  <h2>成长轨迹</h2>
+  <div class="card">
+    <div class="chart-wrap"><canvas id="growth-chart"></canvas></div>
+  </div>
+
+  <h2>安全评估</h2>
+  <div class="card" id="security-card">
+    <div id="security-content"></div>
+  </div>
+
+  <h2>个性化建议</h2>
+  <div id="suggestions"></div>
+
+  <p style="text-align:center; color: var(--text-secondary); margin-top: 3rem; font-size: 0.85rem;">
+    Prompt Analyzer · 数据仅存储于本地 · <span id="report-date"></span>
+  </p>
+</div>
+
+<script>
+// ========== 数据注入占位 ==========
+// 以下 DATA 对象由 Skill 分析完成后填充
+const DATA = {
+  meta: { totalPrompts: 0, dateRange: '', months: 0 },
+  skill: { score: 0, level: '', details: {} },
+  work: { languages: {}, taskTypes: {} },
+  communication: { traits: [] },
+  collaboration: { traits: [] },
+  habits: { totalPrompts: 0, avgLength: 0, activeHours: '' },
+  growth: { labels: [], scores: [] },
+  security: { total: 0, findings: [] },
+  suggestions: []
+};
+
+// ========== 渲染函数 ==========
+function renderMeta() {
+  document.getElementById('report-meta').textContent =
+    '基于过去 ' + DATA.meta.months + ' 个月 · ' + DATA.meta.totalPrompts + ' 条提示词';
+  document.getElementById('report-date').textContent =
+    '生成时间：' + new Date().toLocaleString('zh-CN');
+}
+
+function renderSkill() {
+  var score = DATA.skill.score, level = DATA.skill.level;
+  var ring = document.getElementById('skill-ring');
+  ring.style.setProperty('--score', score);
+  ring.textContent = score;
+  ring.style.color = score >= 70 ? 'var(--accent)' : score >= 40 ? 'var(--warning)' : 'var(--danger)';
+  document.getElementById('skill-level').textContent = level;
+
+  new Chart(document.getElementById('radar-chart'), {
+    type: 'radar',
+    data: {
+      labels: ['复杂度', '高级功能', '精准度', '工具使用', '迭代能力', '安全意识'],
+      datasets: [{
+        label: '当前水平',
+        data: [
+          DATA.skill.details.complexity || 0,
+          DATA.skill.details.advanced || 0,
+          DATA.skill.details.precision || 0,
+          DATA.skill.details.toolUse || 0,
+          DATA.skill.details.iteration || 0,
+          DATA.skill.details.security || 0
+        ],
+        backgroundColor: 'rgba(56,189,248,0.2)',
+        borderColor: 'rgba(56,189,248,0.8)',
+        borderWidth: 2,
+        pointBackgroundColor: '#38bdf8'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          beginAtZero: true, max: 100,
+          ticks: { display: false },
+          grid: { color: 'rgba(148,163,184,0.15)' },
+          angleLines: { color: 'rgba(148,163,184,0.15)' },
+          pointLabels: { color: '#94a3b8', font: { size: 12 } }
+        }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+function renderWork() {
+  var langs = DATA.work.languages;
+  new Chart(document.getElementById('lang-chart'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(langs),
+      datasets: [{ data: Object.values(langs), backgroundColor: ['#38bdf8','#a78bfa','#34d399','#fbbf24','#f87171','#fb923c','#e879f9'], borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right', labels: { color: '#94a3b8', padding: 12, font: { size: 12 } } } }
+    }
+  });
+
+  var tasks = DATA.work.taskTypes;
+  new Chart(document.getElementById('task-chart'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(tasks),
+      datasets: [{ data: Object.values(tasks), backgroundColor: ['#38bdf8','#a78bfa','#34d399','#fbbf24','#f87171'], borderRadius: 6 }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
+        y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 12 } } }
+      }
+    }
+  });
+}
+
+function renderCommAndCollab() {
+  var commDiv = document.getElementById('comm-traits');
+  DATA.communication.traits.forEach(function(t) {
+    commDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span>' + t.value + '</span></div><div class="bar-track"><div class="bar-fill" style="background:var(--accent2);width:' + t.pct + '%"></div></div></div>';
+  });
+
+  var collabDiv = document.getElementById('collab-traits');
+  DATA.collaboration.traits.forEach(function(t) {
+    collabDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span>' + t.value + '</span></div><div class="bar-track"><div class="bar-fill" style="background:var(--accent3);width:' + t.pct + '%"></div></div></div>';
+  });
+}
+
+function renderHabits() {
+  document.getElementById('stat-total').textContent = DATA.habits.totalPrompts;
+  document.getElementById('stat-avg-len').textContent = DATA.habits.avgLength + '字';
+  document.getElementById('stat-active').textContent = DATA.habits.activeHours;
+}
+
+function renderGrowth() {
+  new Chart(document.getElementById('growth-chart'), {
+    type: 'line',
+    data: {
+      labels: DATA.growth.labels,
+      datasets: [{
+        label: '技能评分趋势',
+        data: DATA.growth.scores,
+        borderColor: '#38bdf8',
+        backgroundColor: 'rgba(56,189,248,0.1)',
+        fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#38bdf8'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#94a3b8' } } },
+      scales: {
+        x: { grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
+        y: { min: 0, max: 100, grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } }
+      }
+    }
+  });
+}
+
+function renderSecurity() {
+  var container = document.getElementById('security-content');
+  if (DATA.security.findings.length === 0) {
+    container.innerHTML = '<p style="color:var(--accent3);">全量扫描未发现安全风险</p>';
+    return;
+  }
+  container.innerHTML = '<p style="margin-bottom:1rem;">全量扫描 <strong>' + DATA.security.total + '</strong> 条记录，发现 <strong style="color:var(--danger);">' + DATA.security.findings.length + '</strong> 次疑似信息泄露：</p>';
+  DATA.security.findings.forEach(function(f) {
+    container.innerHTML += '<div class="security-item"><span class="severity-badge severity-' + f.severity + '">' + f.severity + '</span><span style="flex:1;"><strong>' + f.name + '</strong> — ' + f.suggestion + '</span><span style="color:var(--text-secondary);">' + f.count + '次</span></div>';
+  });
+}
+
+function renderSuggestions() {
+  var container = document.getElementById('suggestions');
+  DATA.suggestions.forEach(function(s, i) {
+    container.innerHTML += '<div class="suggestion-card"><h3>建议 ' + (i + 1) + ': ' + s.title + '</h3><p style="color:var(--text-secondary);">' + s.desc + '</p></div>';
+  });
+}
+
+// ========== 启动渲染 ==========
+renderMeta();
+renderSkill();
+renderWork();
+renderCommAndCollab();
+renderHabits();
+renderGrowth();
+renderSecurity();
+renderSuggestions();
+</script>
+</body>
+</html>
