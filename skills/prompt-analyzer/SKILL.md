@@ -196,6 +196,17 @@ Python 52%、TypeScript 28%、Shell 12%、其他 8%
 | MEDIUM | JWT Token | 2 | 使用占位符替代 |
 ```
 
+**安全意识评分**（用于 HTML 报告雷达图）：
+
+根据全量扫描结果计算安全意识评分（0-100）：
+- 0 次泄露 → 95-100 分
+- 仅低危 1-2 次 → 80-94 分
+- 中危少量（1-3 次）→ 60-79 分
+- 高危或大量（>3 次）→ 30-59 分
+- 存在 CRITICAL 级别 → 0-29 分
+
+将此评分存入 `skill.details.security` 字段供 HTML 模板使用。
+
 ### 7. 汇总与建议生成
 
 收集 3 个子代理的结果和安全扫描结果，去重合并，生成使用建议。
@@ -235,6 +246,90 @@ Python 52%、TypeScript 28%、Shell 12%、其他 8%
 - 将分析结果数据注入模板中的 `DATA` 对象
 - 写入到用户当前项目目录：`./ai-profile-report.html`
 - 告知用户：「报告已生成，路径：`./ai-profile-report.html`，双击即可在浏览器中打开」
+
+**HTML DATA 映射规范**：
+
+将子代理输出和安全扫描结果转化为 `DATA` 对象时，使用以下映射：
+
+```
+// 来源：子代理 1 输出
+DATA.skill = {
+  score: 综合评分（数字）,        // 来自"综合评分：XX/100"
+  level: 等级描述（字符串）,       // 根据 score 映射：<40=初级, 40-69=中级, 70-89=高级, ≥90=专家
+  details: {
+    complexity: 复杂度评分（数字）,   // 0-100
+    advanced: 高级功能评分（数字）,   // 0-100
+    precision: 精准度评分（数字）,    // 0-100
+    toolUse: 工具使用评分（数字）,    // 0-100
+    iteration: 迭代协作评分（数字）,  // 0-100
+    security: 安全意识评分（数字）    // 来自步骤 6 的安全意识评分
+  }
+}
+
+// 来源：子代理 2 输出
+DATA.work = {
+  languages: {                    // 技术栈 → 百分比（数字），如 {Python: 52, TypeScript: 28, Shell: 12}
+    "Python": 52, ...
+  },
+  taskTypes: {                    // 任务类型 → 百分比（数字），如 {调试: 38, 新功能: 31, 重构: 18}
+    "调试": 38, ...
+  }
+}
+
+DATA.habits = {
+  totalPrompts: 总记录数（数字，纯数字不含"条"）,
+  avgLength: 平均长度（数字，纯数字不含"字"）,
+  activeHours: 活跃时段（字符串，如"下午 2-5 点"）
+}
+
+DATA.collaboration = {
+  traits: [                       // 3 条特征，每条的 pct 按比例推算
+    { label: "指令型/协作型", value: "指令型占比XX%", pct: 指令型百分比 },
+    { label: "单次解决率", value: "XX%", pct: 数值 },
+    { label: "反馈习惯", value: "经常/偶尔/很少", pct: 经常=85, 偶尔=50, 很少=20 }
+  ]
+}
+
+// 来源：子代理 3 输出
+DATA.communication = {
+  traits: [                       // 5 条特征
+    { label: "中文/英文", value: "中文XX%", pct: 中文占比 },
+    { label: "风格倾向", value: "偏简洁/偏详细", pct: 简洁=30, 均衡=55, 详细=80 },
+    { label: "正式/随意", value: "偏正式/偏随意", pct: 正式=80, 均衡=55, 随意=30 },
+    { label: "礼貌用语", value: "经常/偶尔/很少", pct: 经常=85, 偶尔=50, 很少=20 },
+    { label: "上下文提供", value: "充足/一般/偏少", pct: 充足=85, 一般=55, 偏少=25 }
+  ]
+}
+
+// 来源：子代理 1 成长分析
+DATA.growth = {
+  labels: ["2026-03", "2026-04", "2026-05"],  // 月份字符串数组
+  scores: [45, 52, 61]                          // 对应的评分数字数组
+}
+
+// 来源：步骤 6 安全扫描
+DATA.security = {
+  total: 扫描总记录数（数字）,
+  findings: [                     // 按严重度排序，每个发现：
+    { severity: "critical|high|medium|low", name: "类型名称", suggestion: "建议", count: 次数 }
+  ]
+}
+
+// 来源：步骤 7 建议生成
+DATA.suggestions = [
+  { title: "建议标题", desc: "具体描述" },
+  ...
+]
+
+// 元数据
+DATA.meta = {
+  totalPrompts: 总记录数（数字）,
+  months: 覆盖月份数（数字）,
+  dateRange: "2026-03 ~ 2026-05"（字符串）
+}
+```
+
+重要约束：所有百分比和评分字段必须是纯数字，不要带 % 号或文字单位。HTML 模板会自行添加格式。
 
 ## 隐私说明
 

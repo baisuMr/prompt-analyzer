@@ -70,7 +70,6 @@
   @media (max-width: 640px) {
     .grid, .grid-3 { grid-template-columns: 1fr; }
   }
-  #report-data { display: none; }
 </style>
 </head>
 <body>
@@ -292,10 +291,11 @@ function renderGrowth() {
 function renderSecurity() {
   var container = document.getElementById('security-content');
   if (DATA.security.findings.length === 0) {
-    container.innerHTML = '<p style="color:var(--accent3);">全量扫描未发现安全风险</p>';
+    container.innerHTML = '<p style="color:var(--accent3);">全量扫描 ' + DATA.security.total + ' 条记录，未发现安全风险</p>';
     return;
   }
-  container.innerHTML = '<p style="margin-bottom:1rem;">全量扫描 <strong>' + DATA.security.total + '</strong> 条记录，发现 <strong style="color:var(--danger);">' + DATA.security.findings.length + '</strong> 次疑似信息泄露：</p>';
+  var totalCount = DATA.security.findings.reduce(function(s, f) { return s + f.count; }, 0);
+  container.innerHTML = '<p style="margin-bottom:1rem;">全量扫描 <strong>' + DATA.security.total + '</strong> 条记录，发现 <strong style="color:var(--danger);">' + totalCount + '</strong> 次疑似信息泄露（' + DATA.security.findings.length + ' 类）：</p>';
   DATA.security.findings.forEach(function(f) {
     container.innerHTML += '<div class="security-item"><span class="severity-badge severity-' + f.severity + '">' + f.severity + '</span><span style="flex:1;"><strong>' + f.name + '</strong> — ' + f.suggestion + '</span><span style="color:var(--text-secondary);">' + f.count + '次</span></div>';
   });
