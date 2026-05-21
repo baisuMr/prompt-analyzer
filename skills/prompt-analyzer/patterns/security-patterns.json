@@ -3,18 +3,18 @@
   "description": "正则模式库，用于扫描提示词中的敏感信息泄露",
   "patterns": [
     {
-      "id": "openai-api-key",
-      "name": "OpenAI API Key",
-      "pattern": "sk-[A-Za-z0-9-_]{20,80}",
-      "severity": "high",
-      "suggestion": "使用环境变量 OPENAI_API_KEY 替代硬编码"
-    },
-    {
       "id": "anthropic-api-key",
       "name": "Anthropic API Key",
       "pattern": "sk-ant-[A-Za-z0-9-_]{20,80}",
       "severity": "high",
       "suggestion": "使用环境变量 ANTHROPIC_API_KEY 替代硬编码"
+    },
+    {
+      "id": "ai-api-key-generic",
+      "name": "AI API Key (OpenAI / DeepSeek / 其他)",
+      "pattern": "sk-(?!ant-)[A-Za-z0-9-_]{20,80}",
+      "severity": "high",
+      "suggestion": "使用环境变量存储 API Key，如 OPENAI_API_KEY / DEEPSEEK_API_KEY"
     },
     {
       "id": "github-token",
@@ -87,19 +87,12 @@
       "flags": "i",
       "severity": "medium",
       "suggestion": "不要在提示词中写入明文密码，使用占位符"
-    },
-    {
-      "id": "deepseek-api-key",
-      "name": "DeepSeek API Key",
-      "pattern": "sk-[A-Za-z0-9-_]{20,80}",
-      "severity": "high",
-      "suggestion": "使用环境变量 DEEPSEEK_API_KEY 替代硬编码"
     }
   ],
   "exclude_patterns": [
     {
       "id": "placeholder-skip",
-      "pattern": "(your-api-key|your_token|xxx|placeholder|<[A-Z_]+>)",
+      "pattern": "(your-api-key|your_token|xxx|placeholder|<[A-Z0-9_-]+>)",
       "description": "明显是占位符的数据，排除误报"
     }
   ]

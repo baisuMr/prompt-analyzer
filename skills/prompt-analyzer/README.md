@@ -6,16 +6,17 @@
 
 - 自动记录每次提问（本地存储，不上传）
 - `/analyze-me` 一键生成分析报告
-- 7 大分析维度：AI 技能、工作偏向、沟通风格、使用习惯、成长轨迹、协作模式、安全意识
-- 终端概要报告 + 可选 HTML 可视化报告
-- 个性化使用建议
+- 7+ 分析维度：AI 技能、工作偏向、专业领域、沟通风格、使用习惯、成长轨迹、协作模式、安全意识
+- 终端概要报告 + 可选 HTML 可视化报告（暗色极简风格，支持打印）
+- 个性化使用建议 + 30/60/90 天技能提升路线图
+- 可配置的项目排除和记录上限
 
 ## 安装
 
 ### 方式一：通过插件市场安装（推荐）
 
 ```bash
-claude plugins install prompt-analyzer@your-marketplace
+claude plugins install prompt-analyzer
 ```
 
 安装后重启 Claude Code 即可生效。
@@ -52,12 +53,49 @@ claude plugins install prompt-analyzer@your-marketplace
 - 等待 30-60 秒，获取完整分析报告
 - 可选择生成 HTML 可视化报告
 
+## 配置
+
+在 `~/.claude/prompt-log/config.json` 中可配置以下选项（可选，不存在则使用默认值）：
+
+```json
+{
+  "historicalImportDone": false,
+  "excludeProjects": ["*/sensitive/*"],
+  "maxRecordsPerMonth": 10000
+}
+```
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `historicalImportDone` | boolean | false | 首次 `/analyze-me` 后自动设为 true |
+| `excludeProjects` | string[] | [] | 不记录提示词的项目路径，支持 `*` 通配符 |
+| `maxRecordsPerMonth` | number | 10000 | 每月记录上限，超出不记录；设为 0 不限制 |
+
+参考 `config.example.json` 获取完整模板。
+
 ## 隐私
 
 - 所有数据存储在 `~/.claude/prompt-log/` 本地目录
 - 不会上传任何数据到外部服务
 - 可随时删除数据：删除 `~/.claude/prompt-log/` 目录即可
-- 可在 `~/.claude/prompt-log/config.json` 中配置排除特定项目
+- 可通过 `excludeProjects` 配置排除敏感项目
+- HTML 报告通过 CDN 加载 Google Fonts 和 Chart.js，打开报告时浏览器会向 fonts.googleapis.com、fonts.gstatic.com、cdn.jsdelivr.net 发起请求
+
+## 故障排查
+
+**提示词没有被记录？**
+- 检查 `~/.claude/settings.json` 中的 Hook 配置是否正确
+- 确认 `log-prompt.js` 脚本路径存在且 Node.js 可用
+- 检查是否命中了 `excludeProjects` 排除规则
+
+**运行 `/analyze-me` 没有反应？**
+- 确保 Skill 已安装到 `~/.claude/skills/prompt-analyzer/`
+- 确保 SKILL.md 中的触发规则未被修改
+
+**HTML 报告图表不显示？**
+- HTML 报告需要网络连接加载 Chart.js（CDN）
+- 检查浏览器控制台是否有 CDN 加载错误
+- 可离线使用时自行下载 Chart.js 到本地并修改模板引用路径
 
 ## 卸载
 

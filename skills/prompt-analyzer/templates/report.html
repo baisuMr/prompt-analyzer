@@ -6,422 +6,518 @@
 <title>AI 协作画像分析报告</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <style>
   :root {
-    --primary: #4F46E5;
-    --primary-light: #818CF8;
-    --accent: #EA580C;
-    --accent-light: #FB923C;
-    --bg: #EEF2FF;
-    --card-bg: #FFFFFF;
-    --text: #1E1B4B;
-    --text-secondary: #6B6894;
-    --text-muted: #9B98B5;
-    --border: #D4D2F0;
+    --primary: #2563EB;
+    --primary-light: #DBEAFE;
+    --primary-soft: #EFF6FF;
+    --accent: #F97316;
+    --accent-light: #FFF7ED;
+    --bg: #F8FAFC;
+    --card: #FFFFFF;
+    --text: #1E293B;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --border: #E2E8F0;
+    --border-light: #F1F5F9;
     --success: #10B981;
+    --success-light: #ECFDF5;
     --warning: #F59E0B;
     --danger: #EF4444;
-    --radius-sm: 12px;
-    --radius: 20px;
-    --radius-lg: 28px;
-    --shadow-sm: 0 2px 8px rgba(79,70,229,0.06);
-    --shadow: 0 4px 20px rgba(79,70,229,0.08);
-    --shadow-lg: 0 8px 40px rgba(79,70,229,0.12);
-    --font-display: 'Caveat', cursive;
-    --font-body: 'Quicksand', system-ui, sans-serif;
+    --danger-light: #FEF2F2;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-pill: 9999px;
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 4px 16px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.03);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.05), 0 4px 8px rgba(0,0,0,0.03);
+    --font-display: 'Outfit', system-ui, sans-serif;
+    --font-body: 'Work Sans', system-ui, sans-serif;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: var(--font-body);
-    background: linear-gradient(135deg, #EEF2FF 0%, #F0F5FF 30%, #FFF7ED 70%, #FEF3F0 100%);
-    background-attachment: fixed;
+    background: var(--bg);
     color: var(--text);
-    line-height: 1.7;
-    padding: 24px 20px 60px;
+    line-height: 1.65;
+    padding: 0 20px 80px;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* 背景装饰 */
+  /* 柔和顶部渐变条 */
   body::before {
     content: '';
-    position: fixed;
-    top: -200px; right: -150px;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(129,140,248,0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    bottom: -150px; left: -100px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(251,146,60,0.12) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 0;
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 320px;
+    background: linear-gradient(180deg, #EEF2FF 0%, rgba(239,246,255,0.5) 40%, transparent 100%);
+    pointer-events: none; z-index: 0;
   }
 
-  .container { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+  .container { max-width: 880px; margin: 0 auto; position: relative; z-index: 1; }
 
-  /* 头部 */
+  /* ===== 头部 ===== */
   .header {
     text-align: center;
-    padding: 40px 20px 32px;
-    position: relative;
+    padding: 56px 20px 40px;
   }
-  .header-emoji {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 8px;
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+  .header .kicker {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-soft);
+    padding: 6px 16px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 20px;
   }
   .header h1 {
     font-family: var(--font-display);
-    font-size: clamp(2.2rem, 5vw, 3rem);
+    font-size: clamp(2rem, 4.5vw, 2.8rem);
     font-weight: 700;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.25rem;
-    letter-spacing: 0.02em;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
   }
-  .subtitle {
+  .header .subtitle {
     color: var(--text-secondary);
     font-size: 0.95rem;
     font-weight: 500;
   }
-  .subtitle span {
-    display: inline-block;
-    background: var(--card-bg);
-    padding: 4px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    margin: 0 4px;
-    font-weight: 600;
+  .header .subtitle strong {
     color: var(--primary);
+    font-weight: 700;
   }
 
-  /* 章节标题 */
-  h2 {
+  /* ===== 章节标题 ===== */
+  .section-title {
     font-family: var(--font-display);
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 2.5rem 0 1.2rem;
-    position: relative;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 52px 0 24px;
+    letter-spacing: -0.01em;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
-  h2::after {
-    content: '';
-    flex: 1;
-    height: 2px;
-    background: linear-gradient(90deg, var(--border), transparent);
-    border-radius: 1px;
+  .section-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
   }
 
-  /* 卡片 */
+  /* ===== 卡片 ===== */
   .card {
-    background: var(--card-bg);
+    background: var(--card);
     border-radius: var(--radius);
-    padding: 24px;
+    padding: 32px;
     box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: 1px solid var(--border-light);
+    transition: box-shadow 0.25s ease;
   }
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
+  .card:hover { box-shadow: var(--shadow); }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+  .grid-3-1 { display: grid; grid-template-columns: 3fr 1fr; gap: 22px; }
+
+  /* ===== 评分环 ===== */
+  .skill-row {
+    display: grid; grid-template-columns: 1fr 2fr; gap: 22px;
   }
-
-  /* Grid */
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-
-  /* 评分环 */
-  .score-ring-wrap {
+  .score-card {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 36px 24px;
   }
   .score-ring {
-    width: 140px; height: 140px; border-radius: 50%;
+    width: 136px; height: 136px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    position: relative;
-    margin-bottom: 12px;
+    position: relative; margin-bottom: 18px;
   }
   .score-ring::before {
     content: '';
-    position: absolute; inset: -4px;
-    border-radius: 50%;
+    position: absolute; inset: 0; border-radius: 50%;
     background: conic-gradient(
       var(--primary) calc(var(--score, 0) * 3.6deg),
-      #E8E6F8 0deg
+      #E2E8F0 0deg
     );
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff calc(100% - 5px));
-    mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff calc(100% - 5px));
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #fff calc(100% - 4px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #fff calc(100% - 4px));
   }
   .score-num {
     font-family: var(--font-display);
-    font-size: 2.8rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    position: relative;
-    z-index: 1;
+    font-size: 2.8rem; font-weight: 800;
+    color: var(--primary);
+    position: relative; z-index: 1;
+    letter-spacing: -0.02em;
   }
   .level-badge {
-    padding: 6px 18px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    font-family: var(--font-body);
+    font-family: var(--font-display);
+    font-size: 0.8rem; font-weight: 600;
     color: #FFF;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    background: var(--primary);
+    padding: 7px 22px; border-radius: var(--radius-pill);
+    letter-spacing: 0.02em;
   }
 
-  /* 条形进度 */
-  .bar-wrap { margin-bottom: 14px; }
-  .bar-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9rem; font-weight: 500; }
-  .bar-track { height: 10px; background: #E8E6F8; border-radius: 5px; overflow: hidden; }
+  /* ===== 条形进度 ===== */
+  .bar-wrap { margin-bottom: 20px; }
+  .bar-wrap:last-child { margin-bottom: 0; }
+  .bar-label {
+    display: flex; justify-content: space-between;
+    margin-bottom: 7px;
+    font-size: 0.84rem; font-weight: 600;
+    color: var(--text);
+  }
+  .bar-value {
+    font-family: var(--font-display);
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+  .bar-track {
+    height: 6px;
+    background: var(--primary-soft);
+    border-radius: 3px;
+    overflow: hidden;
+  }
   .bar-fill {
-    height: 100%; border-radius: 5px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100%; border-radius: 3px;
+    background: var(--primary);
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .bar-fill.accent {
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    background: var(--accent);
   }
 
-  /* 建议卡片 */
-  .suggestion-card {
-    background: var(--card-bg);
+  /* ===== 领域标签 ===== */
+  .domain-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .domain-tag {
+    font-family: var(--font-display);
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-soft);
+    padding: 8px 18px;
+    border-radius: var(--radius-pill);
+  }
+  .domain-tag .weight {
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-family: var(--font-body);
+    margin-left: 6px;
+    font-size: 0.75rem;
+  }
+
+  /* ===== 统计卡片 ===== */
+  .stat-card {
+    text-align: center;
+    padding: 34px 20px 30px;
+    background: var(--card);
     border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-bottom: 14px;
-    border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--border-light);
+    transition: box-shadow 0.25s ease;
   }
-  .suggestion-card:hover {
-    transform: translateX(4px);
-    box-shadow: var(--shadow);
+  .stat-card:hover { box-shadow: var(--shadow); }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 2.4rem; font-weight: 800;
+    color: var(--primary);
+    line-height: 1; margin-bottom: 6px;
+    letter-spacing: -0.02em;
   }
-  .suggestion-card::before {
-    content: '';
-    position: absolute; left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: linear-gradient(180deg, var(--primary), var(--accent));
-    border-radius: 0 2px 2px 0;
+  .stat-label {
+    font-size: 0.8rem; font-weight: 500;
+    color: var(--text-secondary);
   }
+
+  /* ===== 建议卡片 ===== */
+  .suggestion-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-xs);
+    border-left: 3px solid var(--primary);
+    transition: box-shadow 0.25s ease;
+  }
+  .suggestion-card:hover { box-shadow: var(--shadow); }
   .suggestion-card h3 {
     font-family: var(--font-display);
-    font-size: 1.3rem;
-    margin-bottom: 0.4rem;
-    color: var(--primary);
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.3rem;
+    letter-spacing: -0.005em;
   }
-  .suggestion-card p { color: var(--text-secondary); font-size: 0.9rem; }
+  .suggestion-card p {
+    color: var(--text-secondary); font-size: 0.87rem;
+    line-height: 1.65; max-width: 640px;
+  }
 
-  /* 安全 */
+  /* ===== 路线图 ===== */
+  .roadmap-phase {
+    padding: 28px 32px;
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-xs);
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .roadmap-phase::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+  }
+  .roadmap-phase.phase-1::before { background: var(--primary); }
+  .roadmap-phase.phase-2::before { background: var(--accent); }
+  .roadmap-phase.phase-3::before { background: #10B981; }
+  .roadmap-phase h3 {
+    font-family: var(--font-display);
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.2rem;
+    letter-spacing: -0.005em;
+  }
+  .roadmap-phase .goal {
+    color: var(--text-secondary); font-size: 0.82rem;
+    margin-bottom: 12px; font-weight: 500;
+  }
+  .roadmap-phase ul { list-style: none; padding: 0; }
+  .roadmap-phase li {
+    color: var(--text-secondary); font-size: 0.82rem;
+    padding: 4px 0 4px 22px; position: relative;
+  }
+  .roadmap-phase li::before {
+    content: '';
+    position: absolute; left: 4px; top: 12px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  /* ===== 安全扫描 ===== */
   .security-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 0; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border-light);
+    font-size: 0.86rem;
   }
   .security-item:last-child { border-bottom: none; }
   .severity-badge {
-    padding: 3px 10px; border-radius: 12px;
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.04em;
+    padding: 4px 10px; border-radius: var(--radius-pill);
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
   }
-  .severity-critical { background: #FEE2E2; color: #991B1B; }
-  .severity-high { background: #FFF7ED; color: #9A3412; }
-  .severity-medium { background: #EEF2FF; color: #3730A3; }
-  .severity-low { background: #F8FAFC; color: #64748B; }
+  .severity-critical { color: var(--danger); background: var(--danger-light); }
+  .severity-high     { color: #C2410C; background: var(--accent-light); }
+  .severity-medium   { color: var(--primary); background: var(--primary-soft); }
+  .severity-low      { color: var(--text-muted); background: #F8FAFC; }
 
-  /* 统计数字 */
-  .stat-card {
-    text-align: center;
-    padding: 28px 16px;
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s ease;
-  }
-  .stat-card:hover { transform: translateY(-2px); }
-  .stat-icon { font-size: 1.8rem; display: block; margin-bottom: 8px; }
-  .stat-num {
-    font-family: var(--font-display);
-    font-size: 2.4rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .stat-label { color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; margin-top: 2px; }
-
-  /* 图表包装 */
+  /* ===== 图表包装 ===== */
   .chart-wrap { position: relative; height: 300px; margin: 0.5rem 0; }
+  .chart-wrap.short { height: 240px; }
 
-  /* 页脚 */
+  /* ===== 卡片内小标题 ===== */
+  .card-label {
+    font-family: var(--font-display);
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 24px;
+  }
+
+  /* ===== 页脚 ===== */
   .footer {
     text-align: center; color: var(--text-muted);
-    margin-top: 3rem; font-size: 0.82rem; font-weight: 500;
+    font-size: 0.78rem; font-weight: 500;
+    margin-top: 64px; padding-top: 28px;
+    border-top: 1px solid var(--border-light);
+    letter-spacing: 0.01em;
   }
 
-  /* 动画 */
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(16px); }
+  /* ===== 入场动画 ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .animate-in {
-    animation: fadeInUp 0.5s ease both;
+  .animate-in { animation: fadeUp 0.5s ease both; }
+
+  /* ===== 移动端 ===== */
+  @media (max-width: 768px) {
+    body { padding: 0 12px 48px; }
+    .header { padding: 36px 12px 28px; }
+    .header h1 { font-size: 1.7rem; }
+    .grid, .grid-3, .grid-3-1, .skill-row { grid-template-columns: 1fr; gap: 16px; }
+    .card, .suggestion-card, .roadmap-phase { padding: 22px; }
+    .stat-card { padding: 24px 16px; }
+    .section-title { margin: 40px 0 18px; font-size: 1.2rem; }
+    .chart-wrap { height: 240px; }
   }
 
-  /* 响应式 */
-  @media (max-width: 768px) {
-    .grid, .grid-3 { grid-template-columns: 1fr; }
-    .header { padding: 24px 12px 20px; }
-    .header h1 { font-size: 2rem; }
-    .card { padding: 18px; }
-  }
   @media (prefers-reduced-motion: reduce) {
-    .card:hover, .stat-card:hover, .suggestion-card:hover { transform: none; }
-    .header-emoji { animation: none; }
     .animate-in { animation: none; opacity: 1; }
     .bar-fill { transition: none; }
+  }
+
+  /* ===== 打印 ===== */
+  @media print {
+    @page { margin: 0.5in; size: auto; }
+    body { background: #fff; padding: 0; }
+    body::before { display: none; }
+    .card, .stat-card, .suggestion-card, .roadmap-phase {
+      box-shadow: none; border: 1px solid #ddd;
+      break-inside: avoid;
+    }
+    .header h1, .stat-num, .score-num, .domain-tag { color: #000; }
+    .level-badge { background: #000; }
+    .bar-fill { background: #888; }
+    .bar-fill.accent { background: #999; }
+    .section-title .dot { background: #000; }
+    .footer { border-top-color: #ccc; }
   }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- 头部 -->
+
+  <!-- ===== 头部 ===== -->
   <header class="header animate-in">
-    <span class="header-emoji" aria-hidden="true">🔮</span>
-    <h1>AI 协作画像分析报告</h1>
+    <div class="kicker">Prompt Analyzer Report</div>
+    <h1>AI 协作画像分析</h1>
     <p class="subtitle" id="report-meta">
-      基于过去 <span>--</span> 个月 · <span>--</span> 条提示词
+      基于 <strong>--</strong> 个月 · <strong>--</strong> 条提示词的数据分析
     </p>
   </header>
 
-  <!-- 技能水平 -->
-  <h2>✨ AI 技能水平</h2>
-  <div class="grid">
-    <div class="card animate-in" style="animation-delay:0.05s;">
-      <div class="score-ring-wrap">
-        <div class="score-ring"><span class="score-num" id="skill-score">--</span></div>
-        <div class="level-badge" id="skill-level">加载中...</div>
-      </div>
+  <!-- ===== 技能水平 ===== -->
+  <div class="section-title"><span class="dot"></span> AI 技能水平</div>
+  <div class="skill-row">
+    <div class="card score-card animate-in" style="animation-delay:0.05s;">
+      <div class="score-ring"><span class="score-num" id="skill-score">--</span></div>
+      <div class="level-badge" id="skill-level">加载中...</div>
     </div>
-    <div class="card animate-in" style="animation-delay:0.1s;">
+    <div class="card animate-in" style="animation-delay:0.10s;">
       <div class="chart-wrap"><canvas id="radar-chart"></canvas></div>
     </div>
   </div>
 
-  <!-- 工作偏向 -->
-  <h2>💼 工作偏向</h2>
+  <!-- ===== 工作偏向 ===== -->
+  <div class="section-title"><span class="dot"></span> 工作偏向</div>
   <div class="grid">
     <div class="card animate-in" style="animation-delay:0.15s;">
+      <div class="card-label">技术栈分布</div>
       <div class="chart-wrap"><canvas id="lang-chart"></canvas></div>
     </div>
-    <div class="card animate-in" style="animation-delay:0.2s;">
+    <div class="card animate-in" style="animation-delay:0.20s;">
+      <div class="card-label">任务类型</div>
       <div class="chart-wrap"><canvas id="task-chart"></canvas></div>
     </div>
   </div>
 
-  <!-- 沟通风格 & 协作模式 -->
-  <h2>💬 沟通风格 &amp; 协作模式</h2>
+  <!-- ===== 专业领域 ===== -->
+  <div class="section-title"><span class="dot"></span> 专业领域</div>
+  <div class="card animate-in" style="animation-delay:0.25s;">
+    <p style="color:var(--text-secondary);font-size:0.84rem;margin-bottom:12px;">根据技术栈与任务类型综合推断</p>
+    <div class="domain-tags" id="domain-display"></div>
+  </div>
+
+  <!-- ===== 沟通风格 & 协作模式 ===== -->
+  <div class="section-title"><span class="dot"></span> 沟通风格 &amp; 协作模式</div>
   <div class="grid">
-    <div class="card animate-in" style="animation-delay:0.25s;">
-      <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:1rem;color:var(--primary);">沟通特征</h3>
+    <div class="card animate-in" style="animation-delay:0.30s;">
+      <div class="card-label">沟通特征</div>
       <div id="comm-traits"></div>
     </div>
-    <div class="card animate-in" style="animation-delay:0.3s;">
-      <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:1rem;color:var(--accent);">协作特征</h3>
+    <div class="card animate-in" style="animation-delay:0.35s;">
+      <div class="card-label">协作特征</div>
       <div id="collab-traits"></div>
     </div>
   </div>
 
-  <!-- 使用习惯 -->
-  <h2>📈 使用习惯</h2>
+  <!-- ===== 使用习惯 ===== -->
+  <div class="section-title"><span class="dot"></span> 使用习惯</div>
   <div class="grid-3">
-    <div class="stat-card animate-in" style="animation-delay:0.35s;">
-      <span class="stat-icon">💬</span>
+    <div class="stat-card animate-in" style="animation-delay:0.40s;">
       <div class="stat-num" id="stat-total">--</div>
       <div class="stat-label">总提示词数</div>
     </div>
-    <div class="stat-card animate-in" style="animation-delay:0.4s;">
-      <span class="stat-icon">📏</span>
+    <div class="stat-card animate-in" style="animation-delay:0.45s;">
       <div class="stat-num" id="stat-avg-len">--</div>
       <div class="stat-label">平均提示词长度</div>
     </div>
-    <div class="stat-card animate-in" style="animation-delay:0.45s;">
-      <span class="stat-icon">⏰</span>
+    <div class="stat-card animate-in" style="animation-delay:0.50s;">
       <div class="stat-num" id="stat-active">--</div>
       <div class="stat-label">活跃时段</div>
     </div>
+    <div class="stat-card animate-in" style="animation-delay:0.52s;">
+      <div class="stat-num" id="stat-workday">--</div>
+      <div class="stat-label">工作日占比</div>
+    </div>
+    <div class="stat-card animate-in" style="animation-delay:0.54s;">
+      <div class="stat-num" id="stat-session-len">--</div>
+      <div class="stat-label">平均会话长度</div>
+    </div>
   </div>
 
-  <!-- 成长轨迹 -->
-  <h2>🚀 成长轨迹</h2>
-  <div class="card animate-in" style="animation-delay:0.5s;">
+  <!-- ===== 成长轨迹 ===== -->
+  <div class="section-title"><span class="dot"></span> 成长轨迹</div>
+  <div class="card animate-in" style="animation-delay:0.55s;">
     <div class="chart-wrap"><canvas id="growth-chart"></canvas></div>
   </div>
 
-  <!-- 安全评估 -->
-  <h2>🛡️ 安全评估</h2>
-  <div class="card animate-in" id="security-card" style="animation-delay:0.55s;">
+  <!-- ===== 安全评估 ===== -->
+  <div class="section-title"><span class="dot"></span> 安全评估</div>
+  <div class="card animate-in" id="security-card" style="animation-delay:0.60s;">
     <div id="security-content"></div>
   </div>
 
-  <!-- 个性化建议 -->
-  <h2>💡 给你的专属建议</h2>
-  <div id="suggestions" class="animate-in" style="animation-delay:0.6s;"></div>
+  <!-- ===== 个性化建议 ===== -->
+  <div class="section-title"><span class="dot"></span> 个性化建议</div>
+  <div id="suggestions" class="animate-in" style="animation-delay:0.65s;"></div>
 
-  <p class="footer">
-    Prompt Analyzer · 数据仅存储于本地 · <span id="report-date"></span>
-  </p>
+  <!-- ===== 技能提升路线图 ===== -->
+  <div class="section-title"><span class="dot"></span> 技能提升路线图</div>
+  <div id="roadmap" class="animate-in" style="animation-delay:0.70s;"></div>
+
+  <p class="footer">Prompt Analyzer · 分析数据仅存本地 · 页面字体及图表库通过 CDN 加载（Google Fonts / jsDelivr）· <span id="report-date"></span></p>
 </div>
 
 <script>
-// ========== 数据注入占位 ==========
 const DATA = {
   meta: { totalPrompts: 0, dateRange: '', months: 0 },
   skill: { score: 0, level: '', details: {} },
-  work: { languages: {}, taskTypes: {} },
+  work: { languages: {}, taskTypes: {}, domains: [] },
   communication: { traits: [] },
   collaboration: { traits: [] },
-  habits: { totalPrompts: 0, avgLength: 0, activeHours: '' },
+  habits: { totalPrompts: 0, avgLength: 0, activeHours: '', workdayRatio: 0, avgSessionLength: 0 },
   growth: { labels: [], scores: [] },
   security: { total: 0, findings: [] },
-  suggestions: []
+  suggestions: [],
+  roadmap: { phase1: { label: '', goal: '', items: [] }, phase2: { label: '', goal: '', items: [] }, phase3: { label: '', goal: '', items: [] } }
 };
 
-// 图表默认色板 — 活泼但不刺眼
-var chartColors = ['#4F46E5','#EA580C','#10B981','#F59E0B','#EC4899','#06B6D4','#8B5CF6'];
-var chartBgColors = chartColors.map(function(c) { return c + '33'; });
+var chartColors = ['#2563EB','#F97316','#10B981','#EC4899','#06B6D4','#8B5CF6','#F59E0B'];
+var chartInstances = {};
 
-// ========== 渲染函数 ==========
+function destroyChart(key) {
+  if (chartInstances[key]) { chartInstances[key].destroy(); chartInstances[key] = null; }
+}
+
 function renderMeta() {
   document.getElementById('report-meta').innerHTML =
-    '基于过去 <span>' + DATA.meta.months + '</span> 个月 · <span>' + DATA.meta.totalPrompts + '</span> 条提示词';
-  document.getElementById('report-date').textContent =
-    '生成时间：' + new Date().toLocaleString('zh-CN');
+    '基于 <strong>' + DATA.meta.months + '</strong> 个月 · <strong>' + DATA.meta.totalPrompts + '</strong> 条提示词的数据分析';
+  document.getElementById('report-date').textContent = '生成时间：' + new Date().toLocaleString('zh-CN');
 }
 
 function renderSkill() {
@@ -431,12 +527,12 @@ function renderSkill() {
   document.getElementById('skill-score').textContent = score;
   document.getElementById('skill-level').textContent = level;
 
-  new Chart(document.getElementById('radar-chart'), {
+  destroyChart('radar');
+  chartInstances.radar = new Chart(document.getElementById('radar-chart'), {
     type: 'radar',
     data: {
-      labels: ['复杂度', '高级功能', '精准度', '工具使用', '迭代能力', '安全意识'],
+      labels: ['复杂度','高级功能','精准度','工具使用','迭代能力','安全意识'],
       datasets: [{
-        label: '当前水平',
         data: [
           DATA.skill.details.complexity || 0,
           DATA.skill.details.advanced || 0,
@@ -445,13 +541,14 @@ function renderSkill() {
           DATA.skill.details.iteration || 0,
           DATA.skill.details.security || 0
         ],
-        backgroundColor: 'rgba(79,70,229,0.12)',
-        borderColor: '#4F46E5',
+        backgroundColor: 'rgba(37,99,235,0.07)',
+        borderColor: '#2563EB',
         borderWidth: 2,
-        pointBackgroundColor: chartColors,
+        pointBackgroundColor: '#2563EB',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
-        pointRadius: 5
+        pointRadius: 4,
+        pointHoverRadius: 7
       }]
     },
     options: {
@@ -460,9 +557,9 @@ function renderSkill() {
         r: {
           beginAtZero: true, max: 100,
           ticks: { display: false, stepSize: 20 },
-          grid: { color: '#D4D2F0' },
-          angleLines: { color: '#D4D2F0' },
-          pointLabels: { color: '#1E1B4B', font: { family: "'Quicksand',sans-serif", size: 13, weight: '600' } }
+          grid: { color: '#E2E8F0' },
+          angleLines: { color: '#E2E8F0' },
+          pointLabels: { color: '#1E293B', font: { size: 12, weight: '600' } }
         }
       },
       plugins: { legend: { display: false } }
@@ -473,7 +570,8 @@ function renderSkill() {
 function renderWork() {
   var langs = DATA.work.languages;
   var langKeys = Object.keys(langs);
-  new Chart(document.getElementById('lang-chart'), {
+  destroyChart('lang');
+  chartInstances.lang = new Chart(document.getElementById('lang-chart'), {
     type: 'doughnut',
     data: {
       labels: langKeys,
@@ -482,7 +580,7 @@ function renderWork() {
         backgroundColor: chartColors.slice(0, langKeys.length),
         borderWidth: 3,
         borderColor: '#fff',
-        hoverBorderColor: '#fff'
+        hoverBorderWidth: 4
       }]
     },
     options: {
@@ -490,7 +588,7 @@ function renderWork() {
       plugins: {
         legend: {
           position: 'right',
-          labels: { color: '#1E1B4B', padding: 14, font: { family: "'Quicksand',sans-serif", size: 13 }, usePointStyle: true, pointStyleWidth: 10 }
+          labels: { color: '#1E293B', padding: 16, font: { size: 12, weight: '600' }, usePointStyle: true, pointStyleWidth: 10 }
         }
       }
     }
@@ -498,7 +596,8 @@ function renderWork() {
 
   var tasks = DATA.work.taskTypes;
   var taskKeys = Object.keys(tasks);
-  new Chart(document.getElementById('task-chart'), {
+  destroyChart('task');
+  chartInstances.task = new Chart(document.getElementById('task-chart'), {
     type: 'bar',
     data: {
       labels: taskKeys,
@@ -506,7 +605,8 @@ function renderWork() {
         data: Object.values(tasks),
         backgroundColor: taskKeys.map(function(_, i) { return chartColors[i % chartColors.length]; }),
         borderRadius: 8,
-        borderSkipped: false
+        borderSkipped: false,
+        barThickness: 22
       }]
     },
     options: {
@@ -514,54 +614,76 @@ function renderWork() {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { color: '#E8E6F8' }, ticks: { color: '#6B6894', font: { family: "'Quicksand',sans-serif" } } },
-        y: { grid: { display: false }, ticks: { color: '#1E1B4B', font: { family: "'Quicksand',sans-serif", size: 13, weight: '600' } } }
+        x: { grid: { color: '#F1F5F9' }, ticks: { color: '#64748B', font: { size: 11, weight: '500' } } },
+        y: { grid: { display: false }, ticks: { color: '#1E293B', font: { size: 12, weight: '600' } } }
       }
     }
   });
 }
 
+function renderDomains() {
+  var container = document.getElementById('domain-display');
+  if (!DATA.work.domains || DATA.work.domains.length === 0) {
+    container.innerHTML = '<span style="color:var(--text-muted);font-size:0.84rem;">数据不足以推断专业领域</span>';
+    return;
+  }
+  DATA.work.domains.forEach(function(d) {
+    container.innerHTML += '<span class="domain-tag">' + d.name + '<span class="weight">' + d.weight + '%</span></span>';
+  });
+}
+
 function renderCommAndCollab() {
   var commDiv = document.getElementById('comm-traits');
-  DATA.communication.traits.forEach(function(t) {
-    commDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span>' + t.value + '</span></div><div class="bar-track"><div class="bar-fill" style="width:' + t.pct + '%"></div></div></div>';
-  });
-
+  if (!DATA.communication.traits || DATA.communication.traits.length === 0) {
+    commDiv.innerHTML = '<span style="color:var(--text-muted);font-size:0.84rem;">数据不足以分析沟通风格</span>';
+  } else {
+    DATA.communication.traits.forEach(function(t) {
+      commDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span class="bar-value">' + t.value + '</span></div><div class="bar-track"><div class="bar-fill" style="width:' + t.pct + '%"></div></div></div>';
+    });
+  }
   var collabDiv = document.getElementById('collab-traits');
-  DATA.collaboration.traits.forEach(function(t) {
-    collabDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span>' + t.value + '</span></div><div class="bar-track"><div class="bar-fill accent" style="width:' + t.pct + '%"></div></div></div>';
-  });
+  if (!DATA.collaboration.traits || DATA.collaboration.traits.length === 0) {
+    collabDiv.innerHTML = '<span style="color:var(--text-muted);font-size:0.84rem;">数据不足以分析协作模式</span>';
+  } else {
+    DATA.collaboration.traits.forEach(function(t) {
+      collabDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span class="bar-value">' + t.value + '</span></div><div class="bar-track"><div class="bar-fill accent" style="width:' + t.pct + '%"></div></div></div>';
+    });
+  }
 }
 
 function renderHabits() {
   document.getElementById('stat-total').textContent = DATA.habits.totalPrompts;
   document.getElementById('stat-avg-len').textContent = DATA.habits.avgLength + '字';
   document.getElementById('stat-active').textContent = DATA.habits.activeHours;
+  document.getElementById('stat-workday').textContent = (DATA.habits.workdayRatio || 0) + '%';
+  document.getElementById('stat-session-len').textContent = (DATA.habits.avgSessionLength || 0) + '轮';
 }
 
 function renderGrowth() {
-  new Chart(document.getElementById('growth-chart'), {
+  destroyChart('growth');
+  chartInstances.growth = new Chart(document.getElementById('growth-chart'), {
     type: 'line',
     data: {
       labels: DATA.growth.labels,
       datasets: [{
         label: '技能评分趋势',
         data: DATA.growth.scores,
-        borderColor: '#4F46E5',
-        backgroundColor: 'rgba(79,70,229,0.08)',
-        fill: true, tension: 0.4, pointRadius: 6,
-        pointBackgroundColor: '#4F46E5',
+        borderColor: '#2563EB',
+        backgroundColor: 'rgba(37,99,235,0.06)',
+        fill: true, tension: 0.35, pointRadius: 5,
+        pointBackgroundColor: '#2563EB',
         pointBorderColor: '#fff',
-        pointBorderWidth: 3,
-        borderWidth: 3
+        pointBorderWidth: 2.5,
+        borderWidth: 2.5,
+        pointHoverRadius: 8
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#6B6894', font: { family: "'Quicksand',sans-serif" }, usePointStyle: true } } },
+      plugins: { legend: { labels: { color: '#64748B', font: { size: 12, weight: '500' }, usePointStyle: true } } },
       scales: {
-        x: { grid: { color: '#E8E6F8' }, ticks: { color: '#6B6894', font: { family: "'Quicksand',sans-serif" } } },
-        y: { min: 0, max: 100, grid: { color: '#E8E6F8' }, ticks: { color: '#6B6894', font: { family: "'Quicksand',sans-serif" } } }
+        x: { grid: { color: '#F1F5F9' }, ticks: { color: '#64748B', font: { size: 11, weight: '500' } } },
+        y: { min: 0, max: 100, grid: { color: '#F1F5F9' }, ticks: { color: '#64748B', font: { size: 11, weight: '500' } } }
       }
     }
   });
@@ -570,20 +692,35 @@ function renderGrowth() {
 function renderSecurity() {
   var container = document.getElementById('security-content');
   if (DATA.security.findings.length === 0) {
-    container.innerHTML = '<p style="text-align:center;color:#10B981;font-size:1.1rem;font-weight:600;padding:12px 0;">✨ 全量扫描 ' + DATA.security.total + ' 条记录，未发现安全风险</p>';
+    container.innerHTML = '<div style="text-align:center;padding:20px 0;"><span style="display:inline-block;width:40px;height:40px;border-radius:50%;background:#ECFDF5;color:#10B981;font-size:1.2rem;line-height:40px;text-align:center;margin-bottom:10px;">✓</span><p style="color:#10B981;font-weight:600;font-size:0.92rem;">全量扫描 ' + DATA.security.total + ' 条记录，未发现安全风险</p></div>';
     return;
   }
   var totalCount = DATA.security.findings.reduce(function(s, f) { return s + f.count; }, 0);
-  container.innerHTML = '<p style="margin-bottom:1rem;font-weight:600;">全量扫描 <strong>' + DATA.security.total + '</strong> 条记录，发现 <strong style="color:#EF4444;">' + totalCount + '</strong> 次疑似信息泄露（' + DATA.security.findings.length + ' 类）：</p>';
+  container.innerHTML = '<p style="margin-bottom:1rem;font-weight:600;font-size:0.88rem;">全量扫描 <strong>' + DATA.security.total + '</strong> 条记录，发现 <strong style="color:#EF4444;">' + totalCount + '</strong> 次疑似信息泄露（' + DATA.security.findings.length + ' 类）：</p>';
   DATA.security.findings.forEach(function(f) {
-    container.innerHTML += '<div class="security-item"><span class="severity-badge severity-' + f.severity + '">' + f.severity + '</span><span style="flex:1;font-weight:500;"><strong>' + f.name + '</strong><span style="color:var(--text-secondary);"> — ' + f.suggestion + '</span></span><span style="color:var(--text-secondary);font-weight:600;">' + f.count + ' 次</span></div>';
+    container.innerHTML += '<div class="security-item"><span class="severity-badge severity-' + f.severity + '">' + f.severity + '</span><span style="flex:1;font-weight:600;">' + f.name + '<span style="color:var(--text-secondary);font-weight:400;"> — ' + f.suggestion + '</span></span><span style="color:var(--text-secondary);font-weight:600;">' + f.count + ' 次</span></div>';
   });
 }
 
 function renderSuggestions() {
   var container = document.getElementById('suggestions');
   DATA.suggestions.forEach(function(s, i) {
-    container.innerHTML += '<div class="suggestion-card" style="animation-delay:' + (0.65 + i * 0.08) + 's;"><h3>' + s.title + '</h3><p>' + s.desc + '</p></div>';
+    container.innerHTML += '<div class="suggestion-card animate-in" style="animation-delay:' + (0.68 + i * 0.06) + 's;"><h3>' + (i + 1) + '. ' + s.title + '</h3><p>' + s.desc + '</p></div>';
+  });
+}
+
+function renderRoadmap() {
+  var container = document.getElementById('roadmap');
+  var phases = [
+    { data: DATA.roadmap.phase1, cls: 'phase-1' },
+    { data: DATA.roadmap.phase2, cls: 'phase-2' },
+    { data: DATA.roadmap.phase3, cls: 'phase-3' }
+  ];
+  var valid = phases.filter(function(p) { return p.data.label; });
+  if (valid.length === 0) { container.innerHTML = '<div class="card" style="text-align:center;color:var(--text-muted);">暂无路线图数据</div>'; return; }
+  valid.forEach(function(p) {
+    var items = p.data.items.map(function(item) { return '<li>' + item + '</li>'; }).join('');
+    container.innerHTML += '<div class="roadmap-phase ' + p.cls + '"><h3>' + p.data.label + '</h3><p class="goal">' + p.data.goal + '</p><ul>' + items + '</ul></div>';
   });
 }
 
@@ -591,11 +728,13 @@ function renderSuggestions() {
 renderMeta();
 renderSkill();
 renderWork();
+renderDomains();
 renderCommAndCollab();
 renderHabits();
 renderGrowth();
 renderSecurity();
 renderSuggestions();
+renderRoadmap();
 </script>
 </body>
 </html>
