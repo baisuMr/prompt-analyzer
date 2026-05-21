@@ -1,0 +1,30 @@
+{
+  "name": "baisuMr",
+  "owner": {
+    "name": "baisuMr",
+    "url": "https://github.com/baisuMr"
+  },
+  "metadata": {
+    "description": "个人 Claude Code 插件集 — AI 协作效率工具",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "prompt-analyzer",
+      "source": "./",
+      "description": "持续收集提示词，生成 AI 协作能力画像分析报告。支持 7+ 维度分析、安全扫描、成长轨迹和个性化建议。",
+      "version": "1.0.0",
+      "strict": false,
+      "homepage": "https://github.com/baisuMr/prompt-analyzer",
+      "license": "MIT",
+      "keywords": [
+        "prompt",
+        "analyzer",
+        "analytics",
+        "profile",
+        "security-scan",
+        "ai-collaboration"
+      ]
+    }
+  ]
+}
