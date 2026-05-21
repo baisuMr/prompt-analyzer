@@ -13,7 +13,19 @@
 
 ## 安装
 
-### 方式一：Git 克隆（推荐）
+### 方式一：插件市场安装（推荐）
+
+```bash
+# 1. 注册自建市场（只需一次）
+/plugin marketplace add baisuMr/prompt-analyzer
+
+# 2. 安装插件
+/plugin install prompt-analyzer@baisuMr
+```
+
+Hook 和 Skill 均自动配置，安装后重启 Claude Code 即可生效。
+
+### 方式二：Git 克隆
 
 ```bash
 git clone https://github.com/baisuMr/prompt-analyzer.git ~/.claude/skills/prompt-analyzer
@@ -39,16 +51,6 @@ git clone https://github.com/baisuMr/prompt-analyzer.git ~/.claude/skills/prompt
 ```
 
 重启 Claude Code 即可生效。
-
-### 方式二：插件安装（即将上线）
-
-待插件市场上线后，可通过以下命令一键安装：
-
-```
-/plugin install prompt-analyzer@baisuMr
-```
-
-Hook 和 Skill 均自动配置，安装后重启 Claude Code 即可生效。
 
 ### 首次使用
 
@@ -108,12 +110,12 @@ Hook 和 Skill 均自动配置，安装后重启 Claude Code 即可生效。
 
 ## 卸载
 
-**插件安装方式：**
+**插件市场安装方式：**
 ```
 /plugin uninstall prompt-analyzer@baisuMr
 ```
 
-**手动安装方式：**
+**Git 克隆方式：**
 1. 删除 `~/.claude/skills/prompt-analyzer/` 目录
 2. 从 `~/.claude/settings.json` 中移除相关 Hook 配置
 3. 如需清除数据：`rm -rf ~/.claude/prompt-log/`
