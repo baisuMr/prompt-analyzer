@@ -1,45 +1,54 @@
 # Prompt Analyzer
 
-一个 Claude Code skill，持续收集你的提示词，根据历史数据生成 AI 协作能力画像分析报告。
+一个 Claude Code 插件，持续收集你的提示词，根据历史数据生成 AI 协作能力画像分析报告。
 
 ## 功能
 
 - 自动记录每次提问（本地存储，不上传）
 - `/analyze-me` 一键生成分析报告
 - 7+ 分析维度：AI 技能、工作偏向、专业领域、沟通风格、使用习惯、成长轨迹、协作模式、安全意识
-- 终端概要报告 + 可选 HTML 可视化报告（暗色极简风格，支持打印）
+- 终端概要报告 + 可选 HTML 可视化报告（支持打印）
 - 个性化使用建议 + 30/60/90 天技能提升路线图
 - 可配置的项目排除和记录上限
 
 ## 安装
 
-### 方式一：通过插件市场安装（推荐）
+### 方式一：插件安装（推荐）
 
-```bash
-claude plugins install prompt-analyzer
+在 Claude Code 中运行：
+
+```
+/plugin install prompt-analyzer@baisuMr
 ```
 
-安装后重启 Claude Code 即可生效。
+Hook 和 Skill 均自动配置，安装后重启 Claude Code 即可生效。
 
-### 方式二：手动安装
+### 方式二：Git 克隆
 
-1. 将 `skills/prompt-analyzer/` 目录复制到 `~/.claude/skills/prompt-analyzer/`
-2. 在 `~/.claude/settings.json` 中添加 Hook 配置：
+```bash
+git clone https://github.com/baisuMr/prompt-analyzer.git ~/.claude/skills/prompt-analyzer
+```
+
+然后在 `~/.claude/settings.json` 中添加 Hook 配置：
 
 ```json
 {
   "hooks": {
-    "user-prompt-submit": [
+    "UserPromptSubmit": [
       {
-        "matcher": "",
-        "command": "node ~/.claude/skills/prompt-analyzer/scripts/log-prompt.js"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/skills/prompt-analyzer/scripts/log-prompt.js"
+          }
+        ]
       }
     ]
   }
 }
 ```
 
-3. 重启 Claude Code
+重启 Claude Code 即可生效。
 
 ### 首次使用
 
@@ -47,7 +56,7 @@ claude plugins install prompt-analyzer
 
 ## 使用
 
-安装后无需任何操作，Skill 会自动记录你的提示词。当你积累了一定量的数据后：
+安装后无需任何操作，插件会自动记录你的提示词。当你积累了一定量的数据后：
 
 - 输入 `/analyze-me` 或说「分析我的提示词」
 - 等待 30-60 秒，获取完整分析报告
@@ -89,7 +98,7 @@ claude plugins install prompt-analyzer
 - 检查是否命中了 `excludeProjects` 排除规则
 
 **运行 `/analyze-me` 没有反应？**
-- 确保 Skill 已安装到 `~/.claude/skills/prompt-analyzer/`
+- 确保插件已安装（运行 `/plugin` 查看列表）
 - 确保 SKILL.md 中的触发规则未被修改
 
 **HTML 报告图表不显示？**
@@ -99,6 +108,12 @@ claude plugins install prompt-analyzer
 
 ## 卸载
 
+**插件安装方式：**
+```
+/plugin uninstall prompt-analyzer@baisuMr
+```
+
+**手动安装方式：**
 1. 删除 `~/.claude/skills/prompt-analyzer/` 目录
 2. 从 `~/.claude/settings.json` 中移除相关 Hook 配置
 3. 如需清除数据：`rm -rf ~/.claude/prompt-log/`

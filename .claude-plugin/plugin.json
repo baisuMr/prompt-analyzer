@@ -1,0 +1,20 @@
+{
+  "name": "prompt-analyzer",
+  "version": "1.0.0",
+  "description": "持续收集提示词，生成 AI 协作能力画像分析报告。支持 7+ 维度分析、安全扫描、成长轨迹和个性化建议。",
+  "author": {
+    "name": "baisuMr",
+    "url": "https://github.com/baisuMr"
+  },
+  "homepage": "https://github.com/baisuMr/prompt-analyzer",
+  "repository": "https://github.com/baisuMr/prompt-analyzer",
+  "license": "MIT",
+  "keywords": [
+    "prompt",
+    "analyzer",
+    "analytics",
+    "profile",
+    "security-scan",
+    "ai-collaboration"
+  ]
+}

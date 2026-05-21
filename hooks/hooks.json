@@ -1,0 +1,16 @@
+{
+  "description": "每次用户提交提示词时，自动记录到本地 JSONL 文件用于分析",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/log-prompt.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
