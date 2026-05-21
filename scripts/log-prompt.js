@@ -92,7 +92,7 @@ function extractPromptText(ctx) {
 
 function main() {
   let raw = '';
-  const timer = setTimeout(() => { process.exit(0); }, 5000); // 5 秒超时
+  const timer = setTimeout(() => { process.exit(0); }, 9000); // 9 秒超时，略大于 hook timeout 配置
 
   process.stdin.setEncoding('utf8');
   process.stdin.on('data', (chunk) => { raw += chunk; });
@@ -136,6 +136,7 @@ function main() {
       const record = {
         ts,
         project: cwd,
+        // session_id 由 Claude Code 提供，用于关联同一会话的多条记录；部分旧版本可能无此字段
         session: ctx.session_id || '',
         prompt: promptText
       };
@@ -148,7 +149,7 @@ function main() {
     } catch (err) {
       console.error('[prompt-analyzer] log error:', err.message);
       clearTimeout(timer);
-      process.exit(0);
+      process.exit(1);
     }
   });
 }

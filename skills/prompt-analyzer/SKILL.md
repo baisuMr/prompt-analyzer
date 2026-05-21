@@ -44,7 +44,7 @@ Hook 脚本在每次记录时会检查此配置。
 
 每次加载本 skill 进行分析时，在开始前输出以下提醒：
 
-> 「Prompt Analyzer 将在本地处理你的提示词数据，不会上传到任何外部服务。所有数据存储于 `~/.claude/prompt-log/`，可随时删除。」
+> 「Prompt Analyzer 将在本地处理你的提示词数据，不会上传到任何外部服务。所有数据以明文 JSONL 格式存储于 `~/.claude/prompt-log/`，可随时删除。生成的 HTML 报告在浏览器中打开时会通过 CDN 加载 Google Fonts 和 Chart.js，不会传输分析数据。」
 
 ## 分析流程
 
@@ -86,7 +86,9 @@ Hook 脚本在每次记录时会检查此配置。
 
 ### 5. 并行子代理分析
 
-同时派发 3 个子代理，每个都接收抽样数据，分别负责不同维度：
+同时派发 3 个子代理，每个都接收抽样数据，分别负责不同维度。
+
+**数据提取约束**：每个子代理必须在输出末尾附带一个 `\`\`\`json` 代码块，包含结构化的分析结果数据，格式见各自的「综合输出格式」后的 JSON 摘要说明。主进程直接从 JSON 代码块提取数据注入 HTML DATA 对象，不要从纯文本中解析。
 
 #### 子代理 1：技能分析
 
@@ -129,6 +131,14 @@ Hook 脚本在每次记录时会检查此配置。
 | 2026-05 | 61 | ↑↑ |
 
 总体趋势：稳步上升。你在近两个月进步明显，主要体现在...
+```
+
+**JSON 摘要**（输出末尾附带）：
+```json
+{
+  "skill": { "score": <0-100>, "level": "<初级/中级/高级/专家>", "details": { "complexity": <>, "advanced": <>, "precision": <>, "toolUse": <>, "iteration": <> } },
+  "growth": { "labels": ["月1","月2"], "scores": [分,分] }
+}
 ```
 
 #### 子代理 2：行为分析
@@ -183,6 +193,17 @@ Python 52%、TypeScript 28%、Shell 12%、其他 8%
 - 反馈习惯：经常/偶尔/很少 给予反馈
 ```
 
+**JSON 摘要**（输出末尾附带）：
+```json
+{
+  "languages": {"Python": 52},
+  "taskTypes": {"调试": 38},
+  "domains": [{"name": "后端开发", "weight": 70}],
+  "habits": { "totalPrompts": <>, "avgLength": <>, "activeHours": "<>", "workdayRatio": <>, "avgSessionLength": <> },
+  "collaboration": { "directivePct": <>, "solveRate": <>, "feedback": "<经常/偶尔/很少>" }
+}
+```
+
 #### 子代理 3：风格分析
 
 **接收数据**：prompt 文本
@@ -204,6 +225,18 @@ Python 52%、TypeScript 28%、Shell 12%、其他 8%
 - 礼貌用语使用频率：经常/偶尔/很少
 - 上下文提供：充足/一般/偏少
 - 情绪特征：稳定/偶尔波动
+```
+
+**JSON 摘要**（输出末尾附带）：
+```json
+{
+  "chinesePct": <>, "englishPct": <>,
+  "style": "<偏简洁/偏详细>",
+  "formality": "<偏正式/偏随意>",
+  "politeness": "<经常/偶尔/很少>",
+  "contextLevel": "<充足/一般/偏少>",
+  "emotion": "<稳定/偶尔波动>"
+}
 ```
 
 ### 6. 安全扫描（主进程执行，不进入子代理）

@@ -13,17 +13,7 @@
 
 ## 安装
 
-### 方式一：插件安装（推荐）
-
-在 Claude Code 中运行：
-
-```
-/plugin install prompt-analyzer@baisuMr
-```
-
-Hook 和 Skill 均自动配置，安装后重启 Claude Code 即可生效。
-
-### 方式二：Git 克隆
+### 方式一：Git 克隆（推荐）
 
 ```bash
 git clone https://github.com/baisuMr/prompt-analyzer.git ~/.claude/skills/prompt-analyzer
@@ -49,6 +39,16 @@ git clone https://github.com/baisuMr/prompt-analyzer.git ~/.claude/skills/prompt
 ```
 
 重启 Claude Code 即可生效。
+
+### 方式二：插件安装（即将上线）
+
+待插件市场上线后，可通过以下命令一键安装：
+
+```
+/plugin install prompt-analyzer@baisuMr
+```
+
+Hook 和 Skill 均自动配置，安装后重启 Claude Code 即可生效。
 
 ### 首次使用
 
