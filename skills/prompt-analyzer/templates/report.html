@@ -4,150 +4,402 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI 协作画像分析报告</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0f172a;
-    --card-bg: #1e293b;
-    --text: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --accent: #38bdf8;
-    --accent2: #a78bfa;
-    --accent3: #34d399;
-    --warning: #fbbf24;
-    --danger: #f87171;
-    --border: #334155;
+    --primary: #4F46E5;
+    --primary-light: #818CF8;
+    --accent: #EA580C;
+    --accent-light: #FB923C;
+    --bg: #EEF2FF;
+    --card-bg: #FFFFFF;
+    --text: #1E1B4B;
+    --text-secondary: #6B6894;
+    --text-muted: #9B98B5;
+    --border: #D4D2F0;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --radius-sm: 12px;
+    --radius: 20px;
+    --radius-lg: 28px;
+    --shadow-sm: 0 2px 8px rgba(79,70,229,0.06);
+    --shadow: 0 4px 20px rgba(79,70,229,0.08);
+    --shadow-lg: 0 8px 40px rgba(79,70,229,0.12);
+    --font-display: 'Caveat', cursive;
+    --font-body: 'Quicksand', system-ui, sans-serif;
   }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
+    font-family: var(--font-body);
+    background: linear-gradient(135deg, #EEF2FF 0%, #F0F5FF 30%, #FFF7ED 70%, #FEF3F0 100%);
+    background-attachment: fixed;
     color: var(--text);
-    line-height: 1.6;
-    padding: 40px 20px;
+    line-height: 1.7;
+    padding: 24px 20px 60px;
+    min-height: 100vh;
   }
-  .container { max-width: 960px; margin: 0 auto; }
-  h1 { font-size: 2rem; margin-bottom: 0.25rem; }
-  h2 { font-size: 1.25rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
-  .subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+
+  /* 背景装饰 */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; right: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(129,140,248,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -150px; left: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(251,146,60,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* 头部 */
+  .header {
+    text-align: center;
+    padding: 40px 20px 32px;
+    position: relative;
+  }
+  .header-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 8px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 5vw, 3rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.02em;
+  }
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .subtitle span {
+    display: inline-block;
+    background: var(--card-bg);
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    margin: 0 4px;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  /* 章节标题 */
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 2.5rem 0 1.2rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, var(--border), transparent);
+    border-radius: 1px;
+  }
+
+  /* 卡片 */
   .card {
     background: var(--card-bg);
-    border-radius: 12px;
+    border-radius: var(--radius);
     padding: 24px;
-    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
     border: 1px solid var(--border);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  /* Grid */
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  /* 评分环 */
+  .score-ring-wrap {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
   .score-ring {
-    width: 120px; height: 120px; border-radius: 50%;
+    width: 140px; height: 140px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; font-weight: 700; margin: 0 auto 1rem;
+    position: relative;
+    margin-bottom: 12px;
   }
-  .level-tag {
-    display: inline-block; padding: 4px 12px; border-radius: 20px;
-    font-size: 0.85rem; font-weight: 600;
+  .score-ring::before {
+    content: '';
+    position: absolute; inset: -4px;
+    border-radius: 50%;
+    background: conic-gradient(
+      var(--primary) calc(var(--score, 0) * 3.6deg),
+      #E8E6F8 0deg
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff calc(100% - 5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff calc(100% - 5px));
   }
-  .bar-wrap { margin-bottom: 12px; }
-  .bar-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9rem; }
-  .bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .score-num {
+    font-family: var(--font-display);
+    font-size: 2.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+  }
+  .level-badge {
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: var(--font-body);
+    color: #FFF;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  }
+
+  /* 条形进度 */
+  .bar-wrap { margin-bottom: 14px; }
+  .bar-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9rem; font-weight: 500; }
+  .bar-track { height: 10px; background: #E8E6F8; border-radius: 5px; overflow: hidden; }
+  .bar-fill {
+    height: 100%; border-radius: 5px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bar-fill.accent {
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  }
+
+  /* 建议卡片 */
   .suggestion-card {
-    background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px; margin-bottom: 12px;
-    border-left: 4px solid var(--accent);
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .suggestion-card h3 { font-size: 1rem; margin-bottom: 0.5rem; color: var(--accent); }
-  .security-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .severity-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-  .severity-critical { background: #7f1d1d; color: #fca5a5; }
-  .severity-high { background: #78350f; color: #fcd34d; }
-  .severity-medium { background: #1e3a5f; color: #93c5fd; }
-  .severity-low { background: #1e293b; color: #94a3b8; }
-  .chart-wrap { position: relative; height: 300px; margin: 1rem 0; }
-  .stat-num { font-size: 2rem; font-weight: 700; }
-  .stat-label { color: var(--text-secondary); font-size: 0.85rem; }
-  @media (max-width: 640px) {
+  .suggestion-card:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow);
+  }
+  .suggestion-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary), var(--accent));
+    border-radius: 0 2px 2px 0;
+  }
+  .suggestion-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin-bottom: 0.4rem;
+    color: var(--primary);
+  }
+  .suggestion-card p { color: var(--text-secondary); font-size: 0.9rem; }
+
+  /* 安全 */
+  .security-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .security-item:last-child { border-bottom: none; }
+  .severity-badge {
+    padding: 3px 10px; border-radius: 12px;
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .severity-critical { background: #FEE2E2; color: #991B1B; }
+  .severity-high { background: #FFF7ED; color: #9A3412; }
+  .severity-medium { background: #EEF2FF; color: #3730A3; }
+  .severity-low { background: #F8FAFC; color: #64748B; }
+
+  /* 统计数字 */
+  .stat-card {
+    text-align: center;
+    padding: 28px 16px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-icon { font-size: 1.8rem; display: block; margin-bottom: 8px; }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label { color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; margin-top: 2px; }
+
+  /* 图表包装 */
+  .chart-wrap { position: relative; height: 300px; margin: 0.5rem 0; }
+
+  /* 页脚 */
+  .footer {
+    text-align: center; color: var(--text-muted);
+    margin-top: 3rem; font-size: 0.82rem; font-weight: 500;
+  }
+
+  /* 动画 */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    animation: fadeInUp 0.5s ease both;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
     .grid, .grid-3 { grid-template-columns: 1fr; }
+    .header { padding: 24px 12px 20px; }
+    .header h1 { font-size: 2rem; }
+    .card { padding: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover, .stat-card:hover, .suggestion-card:hover { transform: none; }
+    .header-emoji { animation: none; }
+    .animate-in { animation: none; opacity: 1; }
+    .bar-fill { transition: none; }
   }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>AI 协作画像分析报告</h1>
-  <p class="subtitle" id="report-meta">基于过去 3 个月 · -- 条提示词</p>
+  <!-- 头部 -->
+  <header class="header animate-in">
+    <span class="header-emoji" aria-hidden="true">🔮</span>
+    <h1>AI 协作画像分析报告</h1>
+    <p class="subtitle" id="report-meta">
+      基于过去 <span>--</span> 个月 · <span>--</span> 条提示词
+    </p>
+  </header>
 
-  <h2>AI 技能水平</h2>
+  <!-- 技能水平 -->
+  <h2>✨ AI 技能水平</h2>
   <div class="grid">
-    <div class="card" style="text-align:center;">
-      <div class="score-ring" id="skill-ring" style="background: conic-gradient(var(--accent) calc(var(--score) * 1%), #1e293b 0);"></div>
-      <div class="level-tag" id="skill-level" style="background: var(--accent); color: #0f172a;">--</div>
+    <div class="card animate-in" style="animation-delay:0.05s;">
+      <div class="score-ring-wrap">
+        <div class="score-ring"><span class="score-num" id="skill-score">--</span></div>
+        <div class="level-badge" id="skill-level">加载中...</div>
+      </div>
     </div>
-    <div class="card">
+    <div class="card animate-in" style="animation-delay:0.1s;">
       <div class="chart-wrap"><canvas id="radar-chart"></canvas></div>
     </div>
   </div>
 
-  <h2>工作偏向</h2>
+  <!-- 工作偏向 -->
+  <h2>💼 工作偏向</h2>
   <div class="grid">
-    <div class="card">
+    <div class="card animate-in" style="animation-delay:0.15s;">
       <div class="chart-wrap"><canvas id="lang-chart"></canvas></div>
     </div>
-    <div class="card">
+    <div class="card animate-in" style="animation-delay:0.2s;">
       <div class="chart-wrap"><canvas id="task-chart"></canvas></div>
     </div>
   </div>
 
-  <h2>沟通风格 & 协作模式</h2>
+  <!-- 沟通风格 & 协作模式 -->
+  <h2>💬 沟通风格 &amp; 协作模式</h2>
   <div class="grid">
-    <div class="card">
-      <h3 style="margin-bottom:1rem;">沟通特征</h3>
+    <div class="card animate-in" style="animation-delay:0.25s;">
+      <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:1rem;color:var(--primary);">沟通特征</h3>
       <div id="comm-traits"></div>
     </div>
-    <div class="card">
-      <h3 style="margin-bottom:1rem;">协作特征</h3>
+    <div class="card animate-in" style="animation-delay:0.3s;">
+      <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:1rem;color:var(--accent);">协作特征</h3>
       <div id="collab-traits"></div>
     </div>
   </div>
 
-  <h2>使用习惯</h2>
+  <!-- 使用习惯 -->
+  <h2>📈 使用习惯</h2>
   <div class="grid-3">
-    <div class="card" style="text-align:center;">
+    <div class="stat-card animate-in" style="animation-delay:0.35s;">
+      <span class="stat-icon">💬</span>
       <div class="stat-num" id="stat-total">--</div>
       <div class="stat-label">总提示词数</div>
     </div>
-    <div class="card" style="text-align:center;">
+    <div class="stat-card animate-in" style="animation-delay:0.4s;">
+      <span class="stat-icon">📏</span>
       <div class="stat-num" id="stat-avg-len">--</div>
       <div class="stat-label">平均提示词长度</div>
     </div>
-    <div class="card" style="text-align:center;">
+    <div class="stat-card animate-in" style="animation-delay:0.45s;">
+      <span class="stat-icon">⏰</span>
       <div class="stat-num" id="stat-active">--</div>
       <div class="stat-label">活跃时段</div>
     </div>
   </div>
 
-  <h2>成长轨迹</h2>
-  <div class="card">
+  <!-- 成长轨迹 -->
+  <h2>🚀 成长轨迹</h2>
+  <div class="card animate-in" style="animation-delay:0.5s;">
     <div class="chart-wrap"><canvas id="growth-chart"></canvas></div>
   </div>
 
-  <h2>安全评估</h2>
-  <div class="card" id="security-card">
+  <!-- 安全评估 -->
+  <h2>🛡️ 安全评估</h2>
+  <div class="card animate-in" id="security-card" style="animation-delay:0.55s;">
     <div id="security-content"></div>
   </div>
 
-  <h2>个性化建议</h2>
-  <div id="suggestions"></div>
+  <!-- 个性化建议 -->
+  <h2>💡 给你的专属建议</h2>
+  <div id="suggestions" class="animate-in" style="animation-delay:0.6s;"></div>
 
-  <p style="text-align:center; color: var(--text-secondary); margin-top: 3rem; font-size: 0.85rem;">
+  <p class="footer">
     Prompt Analyzer · 数据仅存储于本地 · <span id="report-date"></span>
   </p>
 </div>
 
 <script>
 // ========== 数据注入占位 ==========
-// 以下 DATA 对象由 Skill 分析完成后填充
 const DATA = {
   meta: { totalPrompts: 0, dateRange: '', months: 0 },
   skill: { score: 0, level: '', details: {} },
@@ -160,20 +412,23 @@ const DATA = {
   suggestions: []
 };
 
+// 图表默认色板 — 活泼但不刺眼
+var chartColors = ['#4F46E5','#EA580C','#10B981','#F59E0B','#EC4899','#06B6D4','#8B5CF6'];
+var chartBgColors = chartColors.map(function(c) { return c + '33'; });
+
 // ========== 渲染函数 ==========
 function renderMeta() {
-  document.getElementById('report-meta').textContent =
-    '基于过去 ' + DATA.meta.months + ' 个月 · ' + DATA.meta.totalPrompts + ' 条提示词';
+  document.getElementById('report-meta').innerHTML =
+    '基于过去 <span>' + DATA.meta.months + '</span> 个月 · <span>' + DATA.meta.totalPrompts + '</span> 条提示词';
   document.getElementById('report-date').textContent =
     '生成时间：' + new Date().toLocaleString('zh-CN');
 }
 
 function renderSkill() {
   var score = DATA.skill.score, level = DATA.skill.level;
-  var ring = document.getElementById('skill-ring');
-  ring.style.setProperty('--score', score);
-  ring.textContent = score;
-  ring.style.color = score >= 70 ? 'var(--accent)' : score >= 40 ? 'var(--warning)' : 'var(--danger)';
+  var ring = document.querySelector('.score-ring');
+  ring.style.setProperty('--score', Math.min(score, 100));
+  document.getElementById('skill-score').textContent = score;
   document.getElementById('skill-level').textContent = level;
 
   new Chart(document.getElementById('radar-chart'), {
@@ -190,22 +445,24 @@ function renderSkill() {
           DATA.skill.details.iteration || 0,
           DATA.skill.details.security || 0
         ],
-        backgroundColor: 'rgba(56,189,248,0.2)',
-        borderColor: 'rgba(56,189,248,0.8)',
+        backgroundColor: 'rgba(79,70,229,0.12)',
+        borderColor: '#4F46E5',
         borderWidth: 2,
-        pointBackgroundColor: '#38bdf8'
+        pointBackgroundColor: chartColors,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       scales: {
         r: {
           beginAtZero: true, max: 100,
-          ticks: { display: false },
-          grid: { color: 'rgba(148,163,184,0.15)' },
-          angleLines: { color: 'rgba(148,163,184,0.15)' },
-          pointLabels: { color: '#94a3b8', font: { size: 12 } }
+          ticks: { display: false, stepSize: 20 },
+          grid: { color: '#D4D2F0' },
+          angleLines: { color: '#D4D2F0' },
+          pointLabels: { color: '#1E1B4B', font: { family: "'Quicksand',sans-serif", size: 13, weight: '600' } }
         }
       },
       plugins: { legend: { display: false } }
@@ -215,32 +472,50 @@ function renderSkill() {
 
 function renderWork() {
   var langs = DATA.work.languages;
+  var langKeys = Object.keys(langs);
   new Chart(document.getElementById('lang-chart'), {
     type: 'doughnut',
     data: {
-      labels: Object.keys(langs),
-      datasets: [{ data: Object.values(langs), backgroundColor: ['#38bdf8','#a78bfa','#34d399','#fbbf24','#f87171','#fb923c','#e879f9'], borderWidth: 0 }]
+      labels: langKeys,
+      datasets: [{
+        data: Object.values(langs),
+        backgroundColor: chartColors.slice(0, langKeys.length),
+        borderWidth: 3,
+        borderColor: '#fff',
+        hoverBorderColor: '#fff'
+      }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'right', labels: { color: '#94a3b8', padding: 12, font: { size: 12 } } } }
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: '#1E1B4B', padding: 14, font: { family: "'Quicksand',sans-serif", size: 13 }, usePointStyle: true, pointStyleWidth: 10 }
+        }
+      }
     }
   });
 
   var tasks = DATA.work.taskTypes;
+  var taskKeys = Object.keys(tasks);
   new Chart(document.getElementById('task-chart'), {
     type: 'bar',
     data: {
-      labels: Object.keys(tasks),
-      datasets: [{ data: Object.values(tasks), backgroundColor: ['#38bdf8','#a78bfa','#34d399','#fbbf24','#f87171'], borderRadius: 6 }]
+      labels: taskKeys,
+      datasets: [{
+        data: Object.values(tasks),
+        backgroundColor: taskKeys.map(function(_, i) { return chartColors[i % chartColors.length]; }),
+        borderRadius: 8,
+        borderSkipped: false
+      }]
     },
     options: {
       indexAxis: 'y',
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
-        y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 12 } } }
+        x: { grid: { color: '#E8E6F8' }, ticks: { color: '#6B6894', font: { family: "'Quicksand',sans-serif" } } },
+        y: { grid: { display: false }, ticks: { color: '#1E1B4B', font: { family: "'Quicksand',sans-serif", size: 13, weight: '600' } } }
       }
     }
   });
@@ -249,12 +524,12 @@ function renderWork() {
 function renderCommAndCollab() {
   var commDiv = document.getElementById('comm-traits');
   DATA.communication.traits.forEach(function(t) {
-    commDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span>' + t.value + '</span></div><div class="bar-track"><div class="bar-fill" style="background:var(--accent2);width:' + t.pct + '%"></div></div></div>';
+    commDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span>' + t.value + '</span></div><div class="bar-track"><div class="bar-fill" style="width:' + t.pct + '%"></div></div></div>';
   });
 
   var collabDiv = document.getElementById('collab-traits');
   DATA.collaboration.traits.forEach(function(t) {
-    collabDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span>' + t.value + '</span></div><div class="bar-track"><div class="bar-fill" style="background:var(--accent3);width:' + t.pct + '%"></div></div></div>';
+    collabDiv.innerHTML += '<div class="bar-wrap"><div class="bar-label"><span>' + t.label + '</span><span>' + t.value + '</span></div><div class="bar-track"><div class="bar-fill accent" style="width:' + t.pct + '%"></div></div></div>';
   });
 }
 
@@ -272,17 +547,21 @@ function renderGrowth() {
       datasets: [{
         label: '技能评分趋势',
         data: DATA.growth.scores,
-        borderColor: '#38bdf8',
-        backgroundColor: 'rgba(56,189,248,0.1)',
-        fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#38bdf8'
+        borderColor: '#4F46E5',
+        backgroundColor: 'rgba(79,70,229,0.08)',
+        fill: true, tension: 0.4, pointRadius: 6,
+        pointBackgroundColor: '#4F46E5',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 3,
+        borderWidth: 3
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#94a3b8' } } },
+      plugins: { legend: { labels: { color: '#6B6894', font: { family: "'Quicksand',sans-serif" }, usePointStyle: true } } },
       scales: {
-        x: { grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } },
-        y: { min: 0, max: 100, grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8' } }
+        x: { grid: { color: '#E8E6F8' }, ticks: { color: '#6B6894', font: { family: "'Quicksand',sans-serif" } } },
+        y: { min: 0, max: 100, grid: { color: '#E8E6F8' }, ticks: { color: '#6B6894', font: { family: "'Quicksand',sans-serif" } } }
       }
     }
   });
@@ -291,24 +570,24 @@ function renderGrowth() {
 function renderSecurity() {
   var container = document.getElementById('security-content');
   if (DATA.security.findings.length === 0) {
-    container.innerHTML = '<p style="color:var(--accent3);">全量扫描 ' + DATA.security.total + ' 条记录，未发现安全风险</p>';
+    container.innerHTML = '<p style="text-align:center;color:#10B981;font-size:1.1rem;font-weight:600;padding:12px 0;">✨ 全量扫描 ' + DATA.security.total + ' 条记录，未发现安全风险</p>';
     return;
   }
   var totalCount = DATA.security.findings.reduce(function(s, f) { return s + f.count; }, 0);
-  container.innerHTML = '<p style="margin-bottom:1rem;">全量扫描 <strong>' + DATA.security.total + '</strong> 条记录，发现 <strong style="color:var(--danger);">' + totalCount + '</strong> 次疑似信息泄露（' + DATA.security.findings.length + ' 类）：</p>';
+  container.innerHTML = '<p style="margin-bottom:1rem;font-weight:600;">全量扫描 <strong>' + DATA.security.total + '</strong> 条记录，发现 <strong style="color:#EF4444;">' + totalCount + '</strong> 次疑似信息泄露（' + DATA.security.findings.length + ' 类）：</p>';
   DATA.security.findings.forEach(function(f) {
-    container.innerHTML += '<div class="security-item"><span class="severity-badge severity-' + f.severity + '">' + f.severity + '</span><span style="flex:1;"><strong>' + f.name + '</strong> — ' + f.suggestion + '</span><span style="color:var(--text-secondary);">' + f.count + '次</span></div>';
+    container.innerHTML += '<div class="security-item"><span class="severity-badge severity-' + f.severity + '">' + f.severity + '</span><span style="flex:1;font-weight:500;"><strong>' + f.name + '</strong><span style="color:var(--text-secondary);"> — ' + f.suggestion + '</span></span><span style="color:var(--text-secondary);font-weight:600;">' + f.count + ' 次</span></div>';
   });
 }
 
 function renderSuggestions() {
   var container = document.getElementById('suggestions');
   DATA.suggestions.forEach(function(s, i) {
-    container.innerHTML += '<div class="suggestion-card"><h3>建议 ' + (i + 1) + ': ' + s.title + '</h3><p style="color:var(--text-secondary);">' + s.desc + '</p></div>';
+    container.innerHTML += '<div class="suggestion-card" style="animation-delay:' + (0.65 + i * 0.08) + 's;"><h3>' + s.title + '</h3><p>' + s.desc + '</p></div>';
   });
 }
 
-// ========== 启动渲染 ==========
+// ========== 启动 ==========
 renderMeta();
 renderSkill();
 renderWork();
